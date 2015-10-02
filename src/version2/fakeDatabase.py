@@ -13,7 +13,7 @@ class FakeDatabase(DatagramProtocol):
     def loadRacers(self):
         # TODO unit test this.
         # Load each racer from the CSV file.
-        with open('../models/Racers.csv', 'rb') as f:
+        with open('/Users/denversmith/Downloads/SensorSimulator/SensorSimulator/bin/Debug/Racers.csv', 'rb') as f:
             read = csv.reader(f)
             for row in read:
                 # Add new Racer instance to the dictionary.

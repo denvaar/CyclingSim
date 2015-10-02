@@ -1,10 +1,16 @@
+# System imports
 import wx
+# Local imports 
 from ObjectListView import ObjectListView, ColumnDefn
 
-
-class PromoterManagerView(wx.Frame):
+class PromoterView(wx.Frame):
+    '''
+    PromoterView -- This class is the view for a race
+                    promoter. It only deals with the
+                    details of the GUI.
+    '''
     def __init__(self, parent, **kwargs):
-        super(PromoterManagerView, self).__init__(parent,
+        super(PromoterView, self).__init__(parent,
              id=wx.ID_ANY,
              pos=wx.DefaultPosition,
              size=(750,300),
@@ -12,11 +18,8 @@ class PromoterManagerView(wx.Frame):
              **kwargs)
         
         self.SetSizeHints(750, 300)
-        
         panel = wx.Panel(self, wx.ID_ANY)
-
         supa_sizer = wx.BoxSizer(wx.VERTICAL)
-        
         
         self.instruct2Txt = wx.StaticText(panel, wx.ID_ANY,
             u"Add or remove racers to the jumbotron display.",
@@ -69,10 +72,15 @@ class PromoterManagerView(wx.Frame):
 
         self.Bind(wx.EVT_BUTTON, self.onAdd, self.addBtn)
         self.Bind(wx.EVT_BUTTON, self.onRemove, self.delBtn)
+        
+        self.Show(True)
 
     def __del__(self):
         pass
-
+    
+    # ---------------------------------------------------
+    # Event handlers to be implemented in the controller.
+    # ---------------------------------------------------
     def onAdd(self, event):
         event.Skip()
     def onRemove(self, event):
