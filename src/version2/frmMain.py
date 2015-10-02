@@ -8,6 +8,7 @@ from twisted.internet import reactor
 from src.version2.clsMain import MainView
 from src.version2.fakeDatabase import FakeDatabase
 from src.version2.promoter import Promoter
+from src.version2.spectator import Spectator
 
 class MainController(MainView):
     def __init__(self, parent, **kwargs):
@@ -38,10 +39,9 @@ class MainController(MainView):
         for choice in self.subscriberCombo.GetSelections():
             obj = None
             if choice == 0: # Promoter
-                #obj = PromoterManager(self, self.fakeDatabase)
                 obj = Promoter(self, self.fakeDatabase)
             elif choice == 1: # Spectator
-                pass
+                obj = Spectator(self, self.fakeDatabase)
             elif choice == 2: # Race Official
                 pass
             self.olv.AddObject(obj)

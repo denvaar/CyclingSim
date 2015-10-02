@@ -33,8 +33,8 @@ class Promoter(Observer, PromoterView):
         print "Promotor recieved: %s" % data
         # New data has been recieved!
         # Refresh the jumbotron display.
-        self.jumbotron.olv.RepopulateList()
-
+        #self.jumbotron.olv.RepopulateList()
+        self.jumbotron.olv.RefreshObject(data)
     def __repr__(self):
         return "Promoter"
    

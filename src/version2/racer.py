@@ -27,6 +27,12 @@ class Racer(Subject):
     def getBibAndName(self):
         return '(' + str(self.bib) + ') ' + self.first + self.last
 
+    def getTime(self):
+        return self.lastTime
+    
+    def getSensor(self):
+        return self.lastSensor
+    
     def getTeam(self):
         return self.team
     
