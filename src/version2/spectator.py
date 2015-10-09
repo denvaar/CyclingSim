@@ -1,12 +1,15 @@
 import wx
 
-import smtplib
-import email.utils
-from email.mime.text import MIMEText
+#import smtplib
+#import email.utils
+#from email.mime.text import MIMEText
+#from email.mime.multipart import MIMEMultipart
 
 # Local imports
 from src.version2.observer import Observer
 from src.version2.clsSpectator import SpectatorView
+from src.version2.spectatorEmail import SpectatorEmail
+from src.version2.my_email import Email
 
 class Spectator(Observer, SpectatorView):
     '''
@@ -23,37 +26,30 @@ class Spectator(Observer, SpectatorView):
         Observer.__init__(self)
         SpectatorView.__init__(self, parent)
 
+        self.parent = parent
         self.olv.SetObjects(dataSource.getRacerList())
 
         self.selectedObjects = []
         self.updatedObjects = []
-
+    
     def doEmail(self, event):
-        print "sending email"
-        self.updatedObjects = []
-
+        print "tick.."
+        if self.updatedObjects:
+            self.emailer.doEmail(self.updatedObjects)
+            self.updatedObjects = []
+    
     def update(self, data):
         print "Spectator recieved: %s" % data
-        self.updatedObjects.append(data)
-
-        msg_body = "You've signed up to recieve updates for the following racers:\n\n\
-                   %s\t%s" % (data.getBibAndName(), data.getTime())   
-        print msg_body
-        return
-        # New data has been recieved!
-        # Send an email
-        msg = MIMEText('')
-        msg['To'] = email.utils.formataddr(('Recipient', self.emailAddr))
-        msg['From'] = email.utils.formataddr(('Cycling Simulation', 'denverpsmith@gmail.com'))
-        msg['Subject'] = 'Race Updates'
-
-        server = smtplib.SMTP('mail')
-        server.set_debuglevel(True) # show communication with the server
-        try:
-            server.sendmail(self.emailAddr, [self.emailAddr], msg.as_string())
-        finally:
-            server.quit()
-
+        # If we have already added the object into 
+        # the list, then just replace it rather than
+        # append.
+        if data in self.updatedObjects:
+            self.updatedObjects[self.updatedObjects.index(data)] = data
+        else:
+            self.updatedObjects.append(data)
+        # Pass the updates to the emailer.
+        #self.emailer.setUpdatedObjects(self.updatedObjects)
+    
     def __repr__(self):
         return "Spectator"
     
@@ -64,18 +60,21 @@ class Spectator(Observer, SpectatorView):
     def onOK(self, event):
         selected = self.olv.GetSelectedObjects()
         emailAddr = self.emailTxtCtrl.GetValue()
-        print selected
-        print emailAddr
 
         self.selectedObjects = selected
         self.emailAddr = emailAddr
 
+        # Subscribe to each selected racer object.
         [obj.addObserver(self) for obj in self.selectedObjects]
         
         self.emailTimer = wx.Timer(self)
-        self.emailTimer.Start(2000)
+        self.emailTimer.Start(9000)
         self.Bind(wx.EVT_TIMER, self.doEmail)
         
+        # Create a new decorated emailer.
+        self.emailer = SpectatorEmail(Email(self.emailAddr))
+       
+        # Hide the GUI now.
         self.Show(False)
         event.Skip()
 
@@ -86,4 +85,5 @@ class Spectator(Observer, SpectatorView):
     def onClosing(self, event):
         print "closing..."
         [obj.removeObserver(self) for obj in self.selectedObjects]
+        self.parent.olv.RemoveObject(self)
         event.Skip()

@@ -9,28 +9,28 @@ from src.version2.clsPromoter import PromoterView
 
 class Promoter(Observer, PromoterView):
     '''
-        Promoter -- This is the class that represents
-                    a race promoter. It allows one to
-                    move racers in and out of a real-
-                    time jumbotron display.
+    Promoter -- This is the class that represents
+                a race promoter. It allows one to
+                move racers in and out of a real-
+                time jumbotron display.
 
-                    Promoter implements the Observer
-                    interface, and gets its GUI
-                    functionallity from PromoterView.
+                Promoter implements the Observer
+                interface, and gets its GUI
+                functionallity from PromoterView.
     '''
     def __init__(self, parent, dataSource):
         # Call the base class constructors.
         Observer.__init__(self)
         PromoterView.__init__(self, parent)
-        
+        self.parent = parent
         # A promoter has a jumbotron display window.
-        self.jumbotron = JumbotronUIMixin(parent)
+        self.jumbotron = JumbotronUIMixin(self)
         # Populate the object list view control on the left
         # with all of the racers in the database.
         self.olv.SetObjects(dataSource.getRacerList())
-
+       
     def update(self, data):
-        print "Promotor recieved: %s" % data
+        #print "Promotor recieved: %s" % data
         # New data has been recieved!
         # Refresh the jumbotron display.
         #self.jumbotron.olv.RepopulateList()
@@ -38,9 +38,6 @@ class Promoter(Observer, PromoterView):
     def __repr__(self):
         return "Promoter"
    
-    #def addObject(self, obj):
-    #    self.olv.AddObject(obj)
-
     def onAdd(self, event):
         '''
             onAdd -- The event handler for when
@@ -77,4 +74,13 @@ class Promoter(Observer, PromoterView):
         # objects anymore, so for each of the selected
         # objects, AKA racers, we will stop observing them.
         [obj.removeObserver(self) for obj in selected]
+        event.Skip()
+
+    def onClose(self, event):
+        try:
+            if self.jumbotron:
+                self.jumbotron.Close()
+            self.parent.olv.RemoveObject(self)
+        except:
+            raise
         event.Skip()

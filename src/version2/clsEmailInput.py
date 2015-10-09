@@ -1,47 +1,31 @@
 # System imports
 import wx
-# Local imports 
-from ObjectListView import ObjectListView, ColumnDefn
 
-class SpectatorView(wx.Frame):
+class EmailInputView(wx.Frame):
     '''
-    SpectatorView -- This class is the view for a race
+    EmailInputView -- This class is the view for a race
                      spectator. It only deals with the
                      details of the GUI.
     '''
     def __init__(self, parent, **kwargs):
-        super(SpectatorView, self).__init__(parent,
+        super(EmailInputView, self).__init__(parent,
              id=wx.ID_ANY,
              pos=wx.DefaultPosition,
-             size=(400,380),
+             size=(400,160),
              style=wx.DEFAULT_FRAME_STYLE,
              **kwargs)
-        self.SetTitle("Spectator Registration") 
-        self.SetSizeHints(400, 380)
-        self.SetMaxSize((400, 380))
+        self.SetTitle("Race Official Setup") 
+        self.SetSizeHints(400, 160)
+        self.SetMaxSize((400, 160))
         panel = wx.Panel(self, wx.ID_ANY)
         supa_sizer = wx.BoxSizer(wx.VERTICAL)
         
         self.instruct2Txt = wx.StaticText(panel, wx.ID_ANY,
-            u"Select who you want to recieve updates for.",
+            u"Sign up to recieve alerts when cheaters are detected.",
             wx.DefaultPosition, wx.DefaultSize, 0)
         
         supa_sizer.Add(self.instruct2Txt, 0, wx.ALL, 5)
         
-        bSizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.olv = ObjectListView(panel, wx.ID_ANY,
-            pos=wx.DefaultPosition, size=wx.DefaultSize,
-            style=wx.LC_REPORT|wx.SUNKEN_BORDER)
-        self.olv.SetObjects(None)
-        self.olv.SetEmptyListMsg("Loading...")
-        self.olv.SetColumns([
-                    ColumnDefn('Racer', 'left', 150, 'getName'),
-                    ColumnDefn('Bib Number', 'left', 70, 'getBib'),
-                    ColumnDefn('Team', 'left', 100, 'getTeam'),
-        ])
-        bSizer.Add(self.olv, 1, wx.ALL|wx.EXPAND, 5)
-
         bSizer2 = wx.BoxSizer(wx.VERTICAL)
 
         bSizer4 = wx.BoxSizer(wx.HORIZONTAL) 
@@ -63,7 +47,6 @@ class SpectatorView(wx.Frame):
         bSizer3.Add(self.okBtn, 0, wx.ALL, 5)
         bSizer5.Add(bSizer3, 0, wx.ALL|wx.EXPAND, 5)
         
-        supa_sizer.Add(bSizer, 1, wx.ALL|wx.EXPAND, 5)
         supa_sizer.Add(bSizer2, 1, wx.ALL|wx.EXPAND, 5)
         supa_sizer.Add(bSizer5, 1, wx.ALL|wx.ALIGN_RIGHT, 5)
         panel.SetSizer(supa_sizer)
@@ -71,9 +54,9 @@ class SpectatorView(wx.Frame):
         self.Layout()
         self.Centre(wx.BOTH)
 
-        self.Bind(wx.EVT_BUTTON, self.onOK, self.okBtn)
-        self.Bind(wx.EVT_BUTTON, self.onCancel, self.cancelBtn)
-        self.Bind(wx.EVT_CLOSE, self.onClosing)
+        #self.Bind(wx.EVT_BUTTON, self.onOK, self.okBtn)
+        #self.Bind(wx.EVT_BUTTON, self.onCancel, self.cancelBtn)
+        #self.Bind(wx.EVT_CLOSE, self.onClosing)
         
         self.Show(True)
 
@@ -84,6 +67,7 @@ class SpectatorView(wx.Frame):
     # Event handlers to be implemented in the controller.
     # ---------------------------------------------------
     def onOK(self, event):
+        print "oh wow"
         event.Skip()
     def onCancel(self, event):
         event.Skip()

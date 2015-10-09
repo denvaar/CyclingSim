@@ -9,6 +9,7 @@ from src.version2.clsMain import MainView
 from src.version2.fakeDatabase import FakeDatabase
 from src.version2.promoter import Promoter
 from src.version2.spectator import Spectator
+from src.version2.sensor import RaceOfficial
 
 class MainController(MainView):
     def __init__(self, parent, **kwargs):
@@ -33,6 +34,7 @@ class MainController(MainView):
             reactor.stop()
             button.Enable(False) # Can't restart the reactor...
             self.SetStatusText('Status: Not listening.')
+            print self.fakeDatabase.cheaters
         event.Skip()
     
     def onAdd(self, event):
@@ -43,8 +45,19 @@ class MainController(MainView):
             elif choice == 1: # Spectator
                 obj = Spectator(self, self.fakeDatabase)
             elif choice == 2: # Race Official
-                pass
+                obj = RaceOfficial(self, self.fakeDatabase)
             self.olv.AddObject(obj)
+        event.Skip()
+    
+    def onRemove(self, event):
+        selected = self.olv.GetSelectedObjects()
+        #[subscriber.Close() for subscriber in selected]
+        for subscriber in selected:
+            try: 
+                subscriber.Close()
+            except AttributeError:
+                pass
+        self.olv.RemoveObjects(selected)
         event.Skip()
 
     def onClose(self, event):

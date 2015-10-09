@@ -8,6 +8,7 @@ class JumbotronUIMixin(wx.Frame):
              pos=(50,50),
              size=(600,400),
              **kwargs)
+        self.parent = parent
         self.SetTitle('~ ~ ~ J U M B O T R O N ~ ~ ~') 
         panel = wx.Panel(self, wx.ID_ANY)
 
@@ -21,17 +22,18 @@ class JumbotronUIMixin(wx.Frame):
         self.olv1.SetColumns([
                     ColumnDefn('Racer', 'left', 300, 'getBibAndName'),
                     ColumnDefn('Team', 'left', 80, 'getTeam'),
-                    ColumnDefn('Time', 'left', 80, 'lastTime'),
-                    ColumnDefn('Sensor', 'left', 50, 'lastSensor'),
+                    ColumnDefn('Time', 'left', 80, 'getPrettyTime'),
+                    ColumnDefn('Sensor', 'left', 50, 'getSensor'),
         ])
         
         supa_sizer.Add(self.olv1, 1, wx.ALL|wx.EXPAND, 5)
-        
         self.olv = BatchedUpdate(self.olv1, 0.5)
-        
         panel.SetSizer(supa_sizer)
-
-        #self.Bind(wx.EVT_CLOSE, self.onClose)
+        self.Bind(wx.EVT_CLOSE, self.onClose)
 
         self.Layout()
         self.Show(True)
+
+    def onClose(self, event):
+        #self.parent.Close()
+        event.Skip()

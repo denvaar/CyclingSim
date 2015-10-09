@@ -72,6 +72,7 @@ class PromoterView(wx.Frame):
 
         self.Bind(wx.EVT_BUTTON, self.onAdd, self.addBtn)
         self.Bind(wx.EVT_BUTTON, self.onRemove, self.delBtn)
+        self.Bind(wx.EVT_CLOSE, self.onClose)
         
         self.Show(True)
 
@@ -85,3 +86,6 @@ class PromoterView(wx.Frame):
         event.Skip()
     def onRemove(self, event):
         event.Skip()
+    def onClose(self, event):
+        event.Skip()
+

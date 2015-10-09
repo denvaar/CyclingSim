@@ -12,8 +12,9 @@ class Racer(Subject):
         # A list to keep track of the subscribed observers.
         self.observerList = []
 
-        self.lastSensor = '-' 
-        self.lastTime = '-' 
+        self.lastSensor = 0 
+        #self.lastTime = datetime.timedelta(milliseconds=0) 
+        self.lastTime = 0 
 
     def __repr__(self):
         return unicode("Racer Bib#" + str(self.bib))
@@ -25,10 +26,13 @@ class Racer(Subject):
         return self.bib
             
     def getBibAndName(self):
-        return '(' + str(self.bib) + ') ' + self.first + self.last
+        return '(' + str(self.bib) + ') ' + self.first
 
     def getTime(self):
         return self.lastTime
+    
+    def getPrettyTime(self):
+        return datetime.timedelta(milliseconds=self.lastTime)
     
     def getSensor(self):
         return self.lastSensor
@@ -37,7 +41,7 @@ class Racer(Subject):
         return self.team
     
     def setTime(self, t):
-        self.lastTime = datetime.timedelta(milliseconds=t)
+        self.lastTime = t
 
     def setSensor(self, s):
         self.lastSensor = s
@@ -56,7 +60,7 @@ class Racer(Subject):
             raise
 
     def notifyObservers(self):
-        if self.observerList:
-            print "Racer #%s here - telling %s about myself" % (self.bib, self.observerList)
+        #if self.observerList:
+        #    print "Racer #%s here - telling %s about myself" % (self.bib, self.observerList)
         # Give each observer an instance of the current state.
         [observer.update(self) for observer in self.observerList]
