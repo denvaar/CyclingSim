@@ -1,13 +1,12 @@
+# System imports
+import wx
+
 # Local imports
 from src.version2.observer import Observer
 from src.version2.clsJumbotron import JumbotronUIMixin
 from src.version2.clsPromoter import PromoterView
 
-# TODO
-# o If jumboron window is closed, also close the PromoterView window.
-
-
-class Promoter(Observer, PromoterView):
+class Promoter(Observer):
     '''
     Promoter -- This is the class that represents
                 a race promoter. It allows one to
@@ -21,23 +20,39 @@ class Promoter(Observer, PromoterView):
     def __init__(self, parent, dataSource):
         # Call the base class constructors.
         Observer.__init__(self)
-        PromoterView.__init__(self, parent)
+
+        # Handle to parent window.
         self.parent = parent
+
+        # Set up the user interface. 
+        self.view = PromoterView(parent)
+        self.view.addBtn.Bind(wx.EVT_BUTTON, self.onAdd)
+        self.view.delBtn.Bind(wx.EVT_BUTTON, self.onRemove)
+        self.view.Bind(wx.EVT_CLOSE, self.onClose) 
+        
         # A promoter has a jumbotron display window.
-        self.jumbotron = JumbotronUIMixin(self)
+        self.jumbotron = JumbotronUIMixin(self.view)
+        self.jumbotron.Bind(wx.EVT_CLOSE, self.onClose) 
+       
         # Populate the object list view control on the left
         # with all of the racers in the database.
-        self.olv.SetObjects(dataSource.getRacerList())
-       
+        self.view.olv.SetObjects(dataSource.getRacerList())
+    
     def update(self, data):
-        #print "Promotor recieved: %s" % data
         # New data has been recieved!
         # Refresh the jumbotron display.
-        #self.jumbotron.olv.RepopulateList()
         self.jumbotron.olv.RefreshObject(data)
+    
+    def Close(self):
+        self.view.Close()
+
     def __repr__(self):
         return "Promoter"
-   
+  
+    # ===================================
+    # Event Handlers
+    # ===================================
+ 
     def onAdd(self, event):
         '''
             onAdd -- The event handler for when
@@ -45,12 +60,12 @@ class Promoter(Observer, PromoterView):
                      the list on the left into the
                      list on the right.
         '''
-        objectsToAdd = self.olv.GetSelectedObjects()
-        existingObjects = self.olv2.GetObjects()
+        objectsToAdd = self.view.olv.GetSelectedObjects()
+        existingObjects = self.view.olv2.GetObjects()
         for obj in objectsToAdd:
             if obj not in existingObjects:
                 # Add it to the list on the right side.
-                self.olv2.AddObject(obj)
+                self.view.olv2.AddObject(obj)
                 # Add it to the jumbotron window.
                 self.jumbotron.olv.AddObject(obj)
                 # Subscribe the jumbotron window to
@@ -67,8 +82,8 @@ class Promoter(Observer, PromoterView):
         '''
         # We want to remove the object(s) from both the
         # list on the right side, and the jumbotron display.
-        selected = self.olv2.GetSelectedObjects()
-        self.olv2.RemoveObjects(selected)
+        selected = self.view.olv2.GetSelectedObjects()
+        self.view.olv2.RemoveObjects(selected)
         self.jumbotron.olv.RemoveObjects(selected)
         # Also we don't want updates from the selected
         # objects anymore, so for each of the selected
@@ -77,10 +92,7 @@ class Promoter(Observer, PromoterView):
         event.Skip()
 
     def onClose(self, event):
-        try:
-            if self.jumbotron:
-                self.jumbotron.Close()
-            self.parent.olv.RemoveObject(self)
-        except:
-            raise
+        if event.GetEventObject() == self.jumbotron:
+            self.view.Close()
+        self.parent.olv.RemoveObject(self)
         event.Skip()

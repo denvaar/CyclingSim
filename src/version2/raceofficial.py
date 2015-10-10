@@ -1,54 +1,79 @@
 import wx
 
-
-# Local imports
 from src.version2.observer import Observer
-from src.version2.clsRaceOfficial import RaceOfficialView
+from src.version2.clsEmailInput import EmailInputView
+from src.version2.cheaterEmailer import CheaterEmailer
+from src.version2.my_email import Email
 
-class RaceOfficial(Observer, RaceOfficialView):
-    '''
-    '''
+class RaceOfficial(Observer):
     def __init__(self, parent, dataSource):
-        # Call the base class constructors.
-        Observer.__init__(self)
-        RaceOfficialView.__init__(self, parent)
+        self.view = EmailInputView(parent)
+        self.view.okBtn.Bind(wx.EVT_BUTTON, self.onOK)
+        self.view.cancelBtn.Bind(wx.EVT_BUTTON, self.onCancel)
+        self.view.Bind(wx.EVT_CLOSE, self.onClosing)
+        self.dataSource = dataSource
 
+        self.racers = []
+        self.possibleCheaters = []
+        self.cheaters = []
         self.parent = parent
+        [racer.addObserver(self) for racer in self.dataSource.getRacerList()]
+
+
+    def getRacers(self):
+        return self.racers
 
     def update(self, data):
-        print "RaceOfficial recieved: %s" % data
+        self.racers.append(data)
+        self.cheaterCheck()
     
-    def __repr__(self):
-        return "Spectator"
+    def doEmail(self, event):
+        if self.cheaters:
+            self.emailer.doEmail(self.cheaters)
+            self.cheaters = []
     
-    #--------------------------
-    # Event handlers
-    #--------------------------
-
+    def cheaterCheck(self):
+        if len(self.racers) > 1:
+            for i in range(-2, -1):
+                if self.racers[-1].getSensor() == self.racers[i].getSensor():
+                    if self.racers[-1].getTeam() != self.racers[i].getTeam():
+                        if self.racers[-1].getTime() - self.racers[i].getTime() <= 3000:
+                            if (self.racers[-1], self.racers[i]) in self.possibleCheaters or \
+                               (self.racers[-2], self.racers[i]) in self.possibleCheaters:
+                                
+                                if (self.racers[-1], self.racers[i]) not in self.cheaters and \
+                                   (self.racers[i], self.racers[-1]) not in self.cheaters:
+                                    self.cheaters.append((self.racers[-1], self.racers[i]))
+                            
+                            self.possibleCheaters.append((self.racers[-1], self.racers[i]))
+        
+    # ===============================
+    # Event Handlers
+    # ===============================
     def onOK(self, event):
-        selected = self.olv.GetSelectedObjects()
-        emailAddr = self.emailTxtCtrl.GetValue()
-        print selected
-        print emailAddr
+        emailAddr = self.view.emailTxtCtrl.GetValue()
 
-        self.selectedObjects = selected
-        self.emailAddr = emailAddr
-
-        [obj.addObserver(self) for obj in self.selectedObjects]
-        
-        self.emailTimer = wx.Timer(self)
+        self.emailTimer = wx.Timer(self.view)
         self.emailTimer.Start(9000)
-        self.Bind(wx.EVT_TIMER, self.doEmail)
-        
-        self.Show(False)
-        event.Skip()
+        self.view.Bind(wx.EVT_TIMER, self.doEmail)
+    
+        # Create a new decorated emailer.
+        self.emailer = CheaterEmailer(Email(emailAddr))
 
+        self.view.Show(False)
+        event.Skip()
+    
     def onCancel(self, event):
-        self.Close()
+        self.view.Close()
         event.Skip()
-
+    
     def onClosing(self, event):
-        print "closing..."
-        [obj.removeObserver(self) for obj in self.selectedObjects]
+        self.emailTimer.Stop()
+        if self.view:
+            self.view.Close()
+        [racer.removeObserver(self) for racer in self.dataSource.getRacerList()]
         self.parent.olv.RemoveObject(self)
         event.Skip()
+
+    def __repr__(self):
+        return unicode('Race Official')

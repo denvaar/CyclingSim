@@ -6,6 +6,10 @@ from email.mime.multipart import MIMEMultipart
 from src.version2.my_email import Email
 
 class SpectatorEmail(Email):
+    '''
+    This class sends an email that is formatted
+    for specators to revieve race updates.
+    '''
     def __init__(self, toBeDecorated):
         self.decoratedEmail = toBeDecorated
 

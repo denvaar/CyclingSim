@@ -11,7 +11,7 @@ from src.version2.clsSpectator import SpectatorView
 from src.version2.spectatorEmail import SpectatorEmail
 from src.version2.my_email import Email
 
-class Spectator(Observer, SpectatorView):
+class Spectator(Observer):
     '''
     Spectator -- This is the class that represents
                  a race spectator. A spectator can
@@ -24,22 +24,25 @@ class Spectator(Observer, SpectatorView):
     def __init__(self, parent, dataSource):
         # Call the base class constructors.
         Observer.__init__(self)
-        SpectatorView.__init__(self, parent)
-
+        # Get a handle to the parent window.
         self.parent = parent
-        self.olv.SetObjects(dataSource.getRacerList())
+        # Setup a view to handle the user interface.
+        self.view = SpectatorView(parent)
+        # Bind events to handlers.
+        self.view.okBtn.Bind(wx.EVT_BUTTON, self.onOK)
+        self.view.cancelBtn.Bind(wx.EVT_BUTTON, self.onCancel)
+        self.view.Bind(wx.EVT_CLOSE, self.onClosing)
 
+        self.view.olv.SetObjects(dataSource.getRacerList())
         self.selectedObjects = []
         self.updatedObjects = []
     
     def doEmail(self, event):
-        print "tick.."
         if self.updatedObjects:
             self.emailer.doEmail(self.updatedObjects)
             self.updatedObjects = []
     
     def update(self, data):
-        print "Spectator recieved: %s" % data
         # If we have already added the object into 
         # the list, then just replace it rather than
         # append.
@@ -47,19 +50,20 @@ class Spectator(Observer, SpectatorView):
             self.updatedObjects[self.updatedObjects.index(data)] = data
         else:
             self.updatedObjects.append(data)
-        # Pass the updates to the emailer.
-        #self.emailer.setUpdatedObjects(self.updatedObjects)
     
+    def Close(self):
+        self.view.Close()
+ 
     def __repr__(self):
-        return "Spectator"
+        return unicode("Spectator")
     
-    #--------------------------
+    # =============================
     # Event handlers
-    #--------------------------
+    # =============================
 
     def onOK(self, event):
-        selected = self.olv.GetSelectedObjects()
-        emailAddr = self.emailTxtCtrl.GetValue()
+        selected = self.view.olv.GetSelectedObjects()
+        emailAddr = self.view.emailTxtCtrl.GetValue()
 
         self.selectedObjects = selected
         self.emailAddr = emailAddr
@@ -67,23 +71,27 @@ class Spectator(Observer, SpectatorView):
         # Subscribe to each selected racer object.
         [obj.addObserver(self) for obj in self.selectedObjects]
         
-        self.emailTimer = wx.Timer(self)
+        self.emailTimer = wx.Timer(self.view)
         self.emailTimer.Start(9000)
-        self.Bind(wx.EVT_TIMER, self.doEmail)
+        self.view.Bind(wx.EVT_TIMER, self.doEmail)
         
         # Create a new decorated emailer.
         self.emailer = SpectatorEmail(Email(self.emailAddr))
        
         # Hide the GUI now.
-        self.Show(False)
+        self.view.Show(False)
         event.Skip()
 
     def onCancel(self, event):
-        self.Close()
+        self.view.Close()
         event.Skip()
 
     def onClosing(self, event):
-        print "closing..."
+        try:
+            self.view.emailTimer.Stop()
+        except AttributeError:
+            pass 
         [obj.removeObserver(self) for obj in self.selectedObjects]
         self.parent.olv.RemoveObject(self)
         event.Skip()
+

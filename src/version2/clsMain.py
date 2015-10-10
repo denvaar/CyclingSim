@@ -2,6 +2,12 @@ import wx
 from ObjectListView import ObjectListView, ColumnDefn
 
 class MainView(wx.Frame):
+    '''
+    This is the GUI for the main controller.
+    It allows a user to initiate different roles,
+    such as race official, race promoter, or race
+    spectator.
+    '''
     def __init__(self, parent, **kwargs):
         super(MainView, self).__init__(parent,
              id=wx.ID_ANY,

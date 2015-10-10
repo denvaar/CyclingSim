@@ -3,9 +3,8 @@ import wx
 
 class EmailInputView(wx.Frame):
     '''
-    EmailInputView -- This class is the view for a race
-                     spectator. It only deals with the
-                     details of the GUI.
+    This is the GUI that allows a race official to
+    enter their E-Mail address.
     '''
     def __init__(self, parent, **kwargs):
         super(EmailInputView, self).__init__(parent,
@@ -53,23 +52,8 @@ class EmailInputView(wx.Frame):
 
         self.Layout()
         self.Centre(wx.BOTH)
-
-        #self.Bind(wx.EVT_BUTTON, self.onOK, self.okBtn)
-        #self.Bind(wx.EVT_BUTTON, self.onCancel, self.cancelBtn)
-        #self.Bind(wx.EVT_CLOSE, self.onClosing)
         
         self.Show(True)
 
     def __del__(self):
         pass
-    
-    # ---------------------------------------------------
-    # Event handlers to be implemented in the controller.
-    # ---------------------------------------------------
-    def onOK(self, event):
-        print "oh wow"
-        event.Skip()
-    def onCancel(self, event):
-        event.Skip()
-    def onClosing(self, event):
-        event.Skip()

@@ -2,6 +2,10 @@ import wx
 from ObjectListView import ObjectListView, BatchedUpdate, ColumnDefn
 
 class JumbotronUIMixin(wx.Frame):
+    '''
+    This is the GUI that displays a giant list of racers
+    that the race promoter has decided to watch.
+    '''
     def __init__(self, parent, **kwargs):
         super(JumbotronUIMixin, self).__init__(parent,
              id=wx.ID_ANY,
@@ -29,11 +33,7 @@ class JumbotronUIMixin(wx.Frame):
         supa_sizer.Add(self.olv1, 1, wx.ALL|wx.EXPAND, 5)
         self.olv = BatchedUpdate(self.olv1, 0.5)
         panel.SetSizer(supa_sizer)
-        self.Bind(wx.EVT_CLOSE, self.onClose)
 
         self.Layout()
         self.Show(True)
 
-    def onClose(self, event):
-        #self.parent.Close()
-        event.Skip()

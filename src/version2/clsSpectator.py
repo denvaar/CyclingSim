@@ -70,22 +70,8 @@ class SpectatorView(wx.Frame):
 
         self.Layout()
         self.Centre(wx.BOTH)
-
-        self.Bind(wx.EVT_BUTTON, self.onOK, self.okBtn)
-        self.Bind(wx.EVT_BUTTON, self.onCancel, self.cancelBtn)
-        self.Bind(wx.EVT_CLOSE, self.onClosing)
-        
         self.Show(True)
 
     def __del__(self):
         pass
     
-    # ---------------------------------------------------
-    # Event handlers to be implemented in the controller.
-    # ---------------------------------------------------
-    def onOK(self, event):
-        event.Skip()
-    def onCancel(self, event):
-        event.Skip()
-    def onClosing(self, event):
-        event.Skip()

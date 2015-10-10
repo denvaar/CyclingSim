@@ -70,22 +70,12 @@ class PromoterView(wx.Frame):
         self.Layout()
         self.Centre(wx.BOTH)
 
-        self.Bind(wx.EVT_BUTTON, self.onAdd, self.addBtn)
-        self.Bind(wx.EVT_BUTTON, self.onRemove, self.delBtn)
-        self.Bind(wx.EVT_CLOSE, self.onClose)
-        
         self.Show(True)
+    
+    def __repr__(self):
+        return unicode("Promoter")
 
     def __del__(self):
         pass
     
-    # ---------------------------------------------------
-    # Event handlers to be implemented in the controller.
-    # ---------------------------------------------------
-    def onAdd(self, event):
-        event.Skip()
-    def onRemove(self, event):
-        event.Skip()
-    def onClose(self, event):
-        event.Skip()
 

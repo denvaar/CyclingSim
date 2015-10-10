@@ -13,7 +13,6 @@ class Racer(Subject):
         self.observerList = []
 
         self.lastSensor = 0 
-        #self.lastTime = datetime.timedelta(milliseconds=0) 
         self.lastTime = 0 
 
     def __repr__(self):
@@ -46,11 +45,12 @@ class Racer(Subject):
     def setSensor(self, s):
         self.lastSensor = s
 
+    # =======================================
     # Implementing inherited methods
     # from the Subject interface:
+    # =======================================
 
     def addObserver(self, observer):
-        print "Racer #%s here - adding a %s observer" % (self.bib, observer)
         self.observerList.append(observer)
 
     def removeObserver(self, observer):
@@ -60,7 +60,4 @@ class Racer(Subject):
             raise
 
     def notifyObservers(self):
-        #if self.observerList:
-        #    print "Racer #%s here - telling %s about myself" % (self.bib, self.observerList)
-        # Give each observer an instance of the current state.
         [observer.update(self) for observer in self.observerList]
