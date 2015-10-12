@@ -26,8 +26,9 @@ class Email(Emailer):
         msg['Subject'] = 'Race Updates'
         msg.attach(html_body)
         server = smtplib.SMTP('mail.usu.edu')
-        #server.set_debuglevel(1)
+        server.set_debuglevel(1)
         try:
             server.sendmail('cs5700fall2015students@outlook.com', self.emailAddr, msg.as_string())
         finally:
-            server.quit() 
+            server.quit()
+
